@@ -1,26 +1,21 @@
-package tech.mushonnip.ars.domain;
+package tech.mushonnip.ars.model;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.util.Set;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import javax.persistence.*;
+
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 @Entity
-@Table(name = "\"user\"")
 @Getter
 @Setter
-public class User {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Reservation {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -36,8 +31,21 @@ public class User {
     )
     private Long id;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Reservation> userReservations;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(nullable = false)
+    private LocalDate reservationDate;
+
+    @DateTimeFormat(pattern = "HH:mm")
+    @Column
+    private LocalTime startTime;
+
+    @DateTimeFormat(pattern = "HH:mm")
+    @Column
+    private LocalTime endTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false, updatable = false)
     private OffsetDateTime dateCreated;
@@ -55,5 +63,9 @@ public class User {
     public void preUpdate() {
         lastUpdated = OffsetDateTime.now();
     }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AmenityType amenityType;
 
 }

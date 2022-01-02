@@ -5,8 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import tech.mushonnip.ars.domain.User;
-import tech.mushonnip.ars.model.UserDTO;
+import tech.mushonnip.ars.model.User;
 import tech.mushonnip.ars.repos.UserRepository;
 
 
@@ -19,26 +18,30 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<UserDTO> findAll() {
+    public List<User> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> mapToDTO(user, new UserDTO()))
+                .map(user -> mapToDTO(user, new User()))
                 .collect(Collectors.toList());
     }
 
-    public UserDTO get(final Long id) {
+    public User get(final Long id) {
         return userRepository.findById(id)
-                .map(user -> mapToDTO(user, new UserDTO()))
+                .map(user -> mapToDTO(user, new User()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public Long create(final UserDTO userDTO) {
+    public User getUserByUsername(String username) {
+        return userRepository.findUserByUsername(username);
+    }
+
+    public Long create(final User userDTO) {
         final User user = new User();
         mapToEntity(userDTO, user);
         return userRepository.save(user).getId();
     }
 
-    public void update(final Long id, final UserDTO userDTO) {
+    public void update(final Long id, final User userDTO) {
         final User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         mapToEntity(userDTO, user);
@@ -49,12 +52,12 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    private UserDTO mapToDTO(final User user, final UserDTO userDTO) {
+    private User mapToDTO(final User user, final User userDTO) {
         userDTO.setId(user.getId());
         return userDTO;
     }
 
-    private User mapToEntity(final UserDTO userDTO, final User user) {
+    private User mapToEntity(final User userDTO, final User user) {
         return user;
     }
 
